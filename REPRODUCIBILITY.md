@@ -1,29 +1,32 @@
 # Reproduction guide: Section 2.6 / Supplementary Information
 
-This guide documents release **v1.0.0**. It contains operational details moved
+This guide documents release **v1.1.0**, preserving the v1.0.0 training kernels.
+It contains operational details moved
 out of the companion supplement; the supplement retains the model equations,
 training and selection protocol, statistical definitions, tables and figures.
 
 ## Companion supplement
 
-Companion document: **Supplementary Information: Rewritable volumetric weights
-for multilayer inference**, GitHub-linked revision of 25 September 2026,
-covering Section 2.6 and main-text Figs. 6 and 7. The companion Word/PDF file is
-named `Supplementary_Information_Section_2_6`; numerical supporting data are
-provided separately as `Supplementary_Data_1.zip`. Neither manuscript file is
-hosted in this code-only repository. No publication DOI is assigned here.
+Current companion document: **Supplementary_Information_NC10-4**, CNN-only
+red-text revision of 4 October 2026. Its CNN section is titled **Rewritable
+volumetric optical weights for training and inference**. It retains equations
+10-15, Supplementary Figs. 12-13 and Tables 6-7. Numerical supporting data are
+provided separately as `Supplementary_Data_1.zip`. Manuscript files are not
+hosted in this repository. No publication DOI is assigned here.
 
-| Companion section | Scientific content retained in the supplement | Implementation |
+| Current companion item | Scientific content retained in the supplement | Implementation |
 | --- | --- | --- |
-| Note 1, equations S1-S3; Fig. S1 | Binary depth states and differential weights | `scheme_a_binary10.Config`, `binary_ste`; `scheme_a_material_head.optical_weights` |
-| Note 2, equations S4-S7 | Convolution, overlapping adaptive pooling, intensity encoding and scale restoration | `scheme_a_conv_search.patches`, `Model.logits_from_weights`; `scheme_a_material_head.encode_features`, `material_classifier` |
-| Note 3, equations S8-S9 | Persistent state, surrogate gradients and full-bank reset/rewrite | `scheme_a_conv_search.Device.program`, `train`; `scheme_a_multilayer_head.training_logits`; `scheme_a_closed_loop.surrogate_bridge` |
-| Note 4, equations S10-S11; Fig. S2; Tables S1-S2 | Fixed split, validation-only selection, fresh-seed confirmation and statistics | `prepare_data.make_split`; `scheme_a_conv_search.GRID`, `summarize`, `main`; `run_simulation.main` |
-| Note 5, equations S12-S14; Table S3 | Weight, site and branch-product counts; nominal capacity | `scheme_a_conv_search.resources`, `shapes`, `mask_rows`; geometry accounting below |
-| Note 6 | Code and data access | This guide, the release record and `LICENSE` |
+| Equations 10-11; Fig. 12 | Binary depth states and differential weights | `scheme_a_binary10.Config`, `binary_ste`; `scheme_a_material_head.optical_weights` |
+| Equations 12-13 | Convolution, overlapping adaptive pooling, intensity encoding and scale restoration | `scheme_a_conv_search.patches`, `Model.logits_from_weights`; `scheme_a_material_head.encode_features`, `material_classifier` |
+| Equations 14-15; Reset-and-rewrite training | Persistent state, surrogate gradients, cross-entropy and full-bank reset/rewrite | `scheme_a_conv_search.Device.program`, `train`; `scheme_a_multilayer_head.training_logits`; `scheme_a_closed_loop.surrogate_bridge` |
+| Fig. 13; Table 6 | Fixed split, validation-only selection, confirmation, loss and confusion statistics | `prepare_data.make_split`; `scheme_a_conv_search.GRID`, `main`; `run_simulation.main`; `supplementary_reporting.py` |
+| Table 7; Resources and geometry | Weight, site and branch-product counts; nominal capacity | `scheme_a_conv_search.resources`, `shapes`, `mask_rows`; geometry accounting below |
+| Supplementary Data 1 | Code/data access, selection records and documented test reuse | This guide and `SUPPLEMENTARY_REVISION_20261004.md` |
 
-The equations, numbering and table references above correspond to the compressed,
-GitHub-linked supplement, not its earlier nine-note draft.
+This mapping replaces the earlier standalone six-note supplement numbering.
+The reporting additions and supporting data are distributed in v1.1.0; data,
+checkpoints and figures are separate release assets. The original v1.0.0 tag
+is unchanged. No manuscript DOCX is published in this repository or release.
 
 ## Environment and installation
 
@@ -67,7 +70,7 @@ reports elapsed time for the current machine.
 The demonstration took approximately 1.6 seconds inside the script (about
 5 seconds including interpreter/library startup) in the tested environment.
 
-The 32 regression tests include synthetic train/reload cycles, all twelve search
+The regression tests include synthetic train/reload cycles, all twelve search
 architectures, differential readout, binary gradients, data split checks and
 the fixed-model command. They ran in approximately 3 seconds within the test
 runner (approximately 7 seconds including Python/PyTorch startup) on the local
@@ -178,10 +181,11 @@ The expected winner of the recorded search is `c12_k5_s1`. These values identify
 the study record; the code does not force a new run to attain them. Floating-point
 and platform differences can affect training trajectories.
 
-For main-text Fig. 7, class confusion percentages are averaged across three
+For Supplementary Fig. 13d, class confusion percentages are averaged across three
 row-normalized confusion matrices. A display exponent of 0.3 and off-diagonal
 annotation threshold of 0.5% were used in the figure, without changing its
-underlying data. Plotting code is outside this repository. Training-loss means
+underlying data. The reporting update adds plotting code in
+`supplementary_reporting.py`. Training-loss means
 weight each minibatch by sample count; epoch zero has validation but no loss.
 
 ## Geometry accounting
@@ -209,15 +213,18 @@ processing were removed. The released code reproduced all six archived
 10,000-image test prediction arrays exactly; checkpoints were not retrained
 for this check. Unit tests do not establish measured device performance.
 
-Raw MNIST is publicly downloadable. The accompanying **Supplementary Data 1**
+Raw MNIST is publicly downloadable. The revised accompanying **Supplementary Data 1**
 contains source CSV tables for reported metrics, epoch histories, mean confusion
 percentages, per-image predictions, individual search runs, complete architecture
-ranking, resource counts, class counts and depth encoding. Those CSV files and
-archived model weights are not hosted in
-this source-only repository. Training commands regenerate numerical outputs;
-exact replay of a saved model additionally requires its original checkpoint.
+ranking, resource counts, class counts and depth encoding. It additionally
+includes split indices, test-history provenance, six archived confirmation
+checkpoints and their prediction/history/event records. Those files are not
+tracked in this source repository; they are distributed as separate v1.1.0
+release assets and with the revised supplement. Training commands regenerate numerical outputs. For exact
+checkpoint replay and figure generation, see the reporting update guide.
 
-The release is MIT-licensed. Version v1.0.0 fixes the manuscript-associated
-source; future edits should use new versions rather than moving this tag.
+The source code is MIT-licensed. Version v1.0.0 fixes the original training
+source; v1.1.0 adds reporting/replay code and data/figure access without moving
+that tag or changing the trained model.
 No DOI has been minted. A DOI-bearing archival copy and final journal-specific
 code-sharing checks remain publication-stage tasks for the authors.
