@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "source_path_base": "reporting_output_directory",
+  "scope": "Current Supplementary Figures 12 and 13. Existing figure and table names already match the manuscript.",
+  "figures": [
+    {"figure": 12, "source": "Supplementary_Figure_12.png", "export_name": "Supplementary_Figure_12.png"},
+    {"figure": 13, "source": "Supplementary_Figure_13.png", "export_name": "Supplementary_Figure_13.png"}
+  ]
+}

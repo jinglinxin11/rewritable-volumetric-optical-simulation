@@ -1,5 +1,9 @@
 # Reproduction integrity fixes, 5 October 2026
 
+The naming/structure follow-up separates local maintenance instructions from
+the historical v1.1.0 clone command in the root README, links this record, lists
+the actual entry points, and adds a machine-readable map for Figs. 12/13.
+
 This additive maintenance revision does not change the frozen training kernels,
 architecture, dataset split, selection procedure or checkpoint weights. Existing
 v1.0.0 and v1.1.0 tags remain historical study records, not movable aliases for

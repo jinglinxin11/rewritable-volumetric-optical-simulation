@@ -14,6 +14,27 @@ or a hardware demonstration.
 
 ## Reproduction
 
+### Maintenance snapshot versus original release
+
+This checkout includes additive integrity fixes described in
+[REPRODUCIBILITY_FIXES.md](REPRODUCIBILITY_FIXES.md). The maintenance branch is
+`fix/reproducibility-20261005`; it is currently a local revision, not a published
+GitHub release. Use the delivered source directory to run this revision.
+Its exact commit is recorded in the delivery's `SOURCE_REVISION.txt`.
+Do not reclone v1.1.0 expecting these later fixes: v1.1.0 and v1.0.0 remain
+immutable original study records. No tag is moved by this maintenance work.
+
+From this maintenance directory:
+
+```bash
+python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements.txt
+python demo.py
+python -m unittest discover -p "test_*.py" -v
+```
+
+### Original manuscript release
+
 Use the [reproduction guide](REPRODUCIBILITY.md) for the pinned environment,
 demonstration, training commands, output definitions, expected results and
 [Supplementary Note-to-code map](REPRODUCIBILITY.md#companion-supplement).
@@ -46,6 +67,14 @@ python supplementary_reporting.py --data Supplementary_Data_1.zip --output outpu
 ```
 
 ## Scope and citation
+
+The [machine-readable figure map](manuscript_figure_map.json) confirms that the
+current manuscript uses `Supplementary_Figure_12.*`, `Supplementary_Figure_13.*`,
+`Table_6.csv` and `Table_7.csv`. `run_simulation.py` trains the selected model;
+`supplementary_reporting.py` regenerates reports; `replay_checkpoints.py` replays
+archived weights. `reproduce.py` is a compatibility utility module, not a
+one-command reproduction entry point. Preserve `scheme_a_*.py` module names to
+keep historical imports and checkpoints compatible.
 
 The repository contains simulation code, tests and reproduction documentation.
 The published v1.0.0 release does not contain plotting code. The v1.1.0
