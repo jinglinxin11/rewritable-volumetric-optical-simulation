@@ -8,13 +8,18 @@ import csv
 import hashlib
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from zipfile import ZipFile
 
 import numpy as np
 
 SELECTED, REFERENCE = "c12_k5_s1", "c3_k3_s1"
 SEEDS = (3, 4, 5)
+SOURCE_TABLES = frozenset({
+    'class_counts.csv', 'confirmation_metrics.csv', 'depth_encoding.csv',
+    'mean_confusion_percent.csv', 'resources.csv', 'search_run_metrics.csv',
+    'selected_training_history.csv', 'test_predictions.csv', 'validation_ranking.csv',
+})
 
 
 def classification_metrics(labels, predictions):
@@ -34,34 +39,58 @@ def classification_metrics(labels, predictions):
             "macro_f1_percent": float(f1_percent.mean()), "confusion_counts": matrix}
 
 
-def load_tables(source):
+def load_tables(source, required_files=()):
     source = Path(source)
     if source.is_dir():
         members = {p.relative_to(source).as_posix(): p.read_bytes()
                    for p in source.rglob("*") if p.is_file()}
     else:
         with ZipFile(source) as archive:
-            members = {n: archive.read(n) for n in archive.namelist() if not n.endswith("/")}
+            names = [n for n in archive.namelist() if not n.endswith('/')]
+            if len(names) != len(set(names)):
+                raise ValueError('Duplicate archive member')
+            members = {n: archive.read(n) for n in names}
     manifest = json.loads(members["manifest.json"])
     entries = manifest if isinstance(manifest, list) else manifest["files"]
+    paths = [row['file'] for row in entries]
+    if len(paths) != len(set(paths)):
+        raise ValueError('Duplicate manifest path')
+    if any(not isinstance(name, str) or PurePosixPath(name).is_absolute()
+           or '..' in PurePosixPath(name).parts or '\\' in name for name in paths):
+        raise ValueError('Invalid manifest path')
+    actual = set(members) - {'manifest.json'}
+    if set(paths) != actual:
+        raise ValueError(f'Manifest coverage mismatch: unlisted={sorted(actual-set(paths))}, '
+                         f'missing={sorted(set(paths)-actual)}')
+    if not set(required_files).issubset(actual):
+        raise ValueError(f'Missing required source files: {sorted(set(required_files)-actual)}')
     for row in entries:
         if hashlib.sha256(members[row["file"]]).hexdigest() != row["sha256"]:
             raise ValueError(f"SHA-256 mismatch: {row['file']}")
+        if 'bytes' in row and row['bytes'] != len(members[row['file']]):
+            raise ValueError(f"Size mismatch: {row['file']}")
     tables = {name: list(csv.DictReader(io.StringIO(data.decode("utf-8-sig"))))
               for name, data in members.items() if name.endswith(".csv")}
     return tables, members
 
 
+def confirmation_records(rows):
+    keys = [(row['architecture'], int(row['seed'])) for row in rows]
+    expected = {(architecture, seed) for architecture in (REFERENCE, SELECTED) for seed in SEEDS}
+    if len(keys) != 6 or len(set(keys)) != 6 or set(keys) != expected:
+        raise ValueError('Expected exactly six unique confirmation records for seeds 3, 4, 5')
+    return dict(zip(keys, rows))
+
+
 def validate_tables(tables):
+    if not SOURCE_TABLES.issubset(tables):
+        raise ValueError(f'Missing required source tables: {sorted(SOURCE_TABLES-set(tables))}')
+    metrics = confirmation_records(tables['confirmation_metrics.csv'])
     records = tables["test_predictions.csv"]
     if [int(r["official_test_index"]) for r in records] != list(range(10000)):
         raise ValueError("Expected exactly the 10,000 ordered official test indices")
     labels = np.array([int(r["true_digit"]) for r in records])
     results, matrices, summary = [], [], {}
-    metrics = {(r["architecture"], int(r["seed"])): r
-               for r in tables["confirmation_metrics.csv"]}
-    if set(metrics) != {(a, s) for a in (REFERENCE, SELECTED) for s in SEEDS}:
-        raise ValueError("Expected six confirmation records for seeds 3, 4, 5")
     for architecture in (REFERENCE, SELECTED):
         rows = []
         for seed in SEEDS:
@@ -94,6 +123,9 @@ def validate_tables(tables):
         supplied[i, j] = float(row["percent"])
     np.testing.assert_allclose(supplied, mean_matrix, rtol=0, atol=1e-10)
     np.testing.assert_allclose(mean_matrix.sum(1), 100, rtol=0, atol=1e-10)
+    if (len(tables['class_counts.csv']) != 10
+            or {int(row['digit']) for row in tables['class_counts.csv']} != set(range(10))):
+        raise ValueError('Expected ten unique class-count records')
     for row in tables["class_counts.csv"]:
         if int(row["test"]) != int(np.sum(labels == int(row["digit"]))):
             raise ValueError("Test class counts differ from predictions")
@@ -234,7 +266,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True, help="New output directory")
     parser.add_argument("--red-text", action="store_true", help="Mark regenerated figure text red for review")
     args = parser.parse_args()
-    tables, members = load_tables(args.data)
+    tables, members = load_tables(args.data, required_files=SOURCE_TABLES)
     audit = validate_tables(tables)
     audit["source_sha256"] = {n: hashlib.sha256(b).hexdigest() for n, b in members.items() if n.endswith(".csv")}
     plot_figures(tables, audit, args.output, args.red_text)

@@ -9,7 +9,7 @@ import torch
 
 import scheme_a_conv_search as simulation
 from prepare_data import prepare
-from supplementary_reporting import classification_metrics, load_tables
+from supplementary_reporting import SOURCE_TABLES, classification_metrics, load_tables
 
 
 def main():
@@ -20,7 +20,11 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Use a new output directory")
-    load_tables(args.archive)  # Validate all member hashes before loading checkpoints.
+    required = set(SOURCE_TABLES) | {'provenance/split_indices.npz', 'provenance/test_history.json'}
+    required.update(f'confirmation/{architecture}_seed{seed}{suffix}'
+                    for architecture in ('c3_k3_s1', 'c12_k5_s1')
+                    for seed in (3, 4, 5) for suffix in ('.pt', '_test.npz'))
+    load_tables(args.archive, required_files=required)
     torch.set_num_threads(4)
     torch.use_deterministic_algorithms(True)
     args.output.mkdir(parents=True)

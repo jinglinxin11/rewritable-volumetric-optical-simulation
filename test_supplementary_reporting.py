@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 from zipfile import ZipFile
 import numpy as np
-from supplementary_reporting import classification_metrics, load_tables
+from supplementary_reporting import classification_metrics, confirmation_records, load_tables
 
 
 class ReportingTests(unittest.TestCase):
@@ -58,6 +58,51 @@ class ReportingTests(unittest.TestCase):
                 {"file": "provenance/evidence.json", "sha256": hashlib.sha256(data).hexdigest()}]))
             _, members = load_tables(path)
             self.assertEqual(members["provenance/evidence.json"], data)
+
+    def test_unlisted_checkpoint_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            (path / 'checkpoint.pt').write_bytes(b'corrupt checkpoint')
+            (path / 'manifest.json').write_text('[]')
+            with self.assertRaisesRegex(ValueError, 'coverage'):
+                load_tables(path)
+
+    def test_required_file_cannot_be_removed_with_its_manifest_entry(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            (path / 'manifest.json').write_text('[]')
+            with self.assertRaisesRegex(ValueError, 'Missing required'):
+                load_tables(path, required_files={'checkpoint.pt'})
+
+    def test_duplicate_manifest_path_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            data = b'evidence'
+            entry = {'file': 'evidence.bin', 'sha256': hashlib.sha256(data).hexdigest()}
+            (path / 'evidence.bin').write_bytes(data)
+            (path / 'manifest.json').write_text(json.dumps([entry, entry]))
+            with self.assertRaisesRegex(ValueError, 'Duplicate manifest'):
+                load_tables(path)
+
+    def test_size_mismatch_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)
+            data = b'evidence'
+            (path / 'evidence.bin').write_bytes(data)
+            (path / 'manifest.json').write_text(json.dumps([{
+                'file': 'evidence.bin', 'sha256': hashlib.sha256(data).hexdigest(), 'bytes': 1}]))
+            with self.assertRaisesRegex(ValueError, 'Size mismatch'):
+                load_tables(path)
+
+    def test_duplicate_confirmation_record_rejected(self):
+        rows = [{'architecture': arch, 'seed': seed}
+                for arch in ('c3_k3_s1', 'c12_k5_s1') for seed in (3, 4, 5)]
+        self.assertEqual(len(confirmation_records(rows)), 6)
+        with self.assertRaisesRegex(ValueError, 'six unique'):
+            confirmation_records(rows + [rows[0]])
+        rows[-1] = rows[0]
+        with self.assertRaisesRegex(ValueError, 'six unique'):
+            confirmation_records(rows)
 
 
 if __name__ == "__main__":
