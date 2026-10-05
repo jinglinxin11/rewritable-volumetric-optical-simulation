@@ -18,15 +18,18 @@ or a hardware demonstration.
 
 This checkout includes additive integrity fixes described in
 [REPRODUCIBILITY_FIXES.md](REPRODUCIBILITY_FIXES.md). The maintenance branch is
-`fix/reproducibility-20261005`; it is currently a local revision, not a published
-GitHub release. Use the delivered source directory to run this revision.
-Its exact commit is recorded in the delivery's `SOURCE_REVISION.txt`.
+`fix/reproducibility-20261005`; its commits are also available on `main`.
+Clone the maintained source with the command below. This is a maintenance
+revision, not a replacement for the historical release assets.
+Use `git rev-parse HEAD` to record the exact source commit used for reproduction.
 Do not reclone v1.1.0 expecting these later fixes: v1.1.0 and v1.0.0 remain
 immutable original study records. No tag is moved by this maintenance work.
 
 From this maintenance directory:
 
 ```bash
+git clone --branch main https://github.com/jinglinxin11/rewritable-volumetric-optical-simulation.git
+cd rewritable-volumetric-optical-simulation
 python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r requirements.txt
 python demo.py

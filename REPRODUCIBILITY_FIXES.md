@@ -1,6 +1,6 @@
 # Reproduction integrity fixes, 5 October 2026
 
-The naming/structure follow-up separates local maintenance instructions from
+The naming/structure follow-up separates maintenance instructions from
 the historical v1.1.0 clone command in the root README, links this record, lists
 the actual entry points, and adds a machine-readable map for Figs. 12/13.
 
