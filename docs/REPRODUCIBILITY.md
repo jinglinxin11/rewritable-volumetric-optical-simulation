@@ -55,7 +55,7 @@ benchmarked; package download time depends on the connection and cache.
 
 ```bash
 python demo.py
-python -m unittest discover -p "test_*.py" -v
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 The demonstration generates sixteen deterministic synthetic 28 x 28 images,
