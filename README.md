@@ -92,8 +92,6 @@ any site changed, all four banks are erased and rewritten.
 └── docs/
     ├── REPRODUCIBILITY.md                  # full protocol and equation-to-code map
     ├── SUPPLEMENTARY_REVISION_20261004.md  # reporting and replay guide
-    ├── REPRODUCIBILITY_FIXES.md            # integrity checks on source data
-    ├── RELEASE_v1.1.0.md                   # release notes
     └── manuscript_figure_map.json          # figure file names used in the manuscript
 ```
 
