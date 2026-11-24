@@ -1,4 +1,0 @@
-numpy>=1.24
-torch>=2.0
-# Test-only dependency:
-pytest>=7

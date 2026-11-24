@@ -42,6 +42,7 @@
 |---|---|
 | `config.py` | 选定网络、材料和资源数 |
 | `data.py` | 本地 MNIST 校验、固定划分、14×14 预处理 |
+| `preprocessing.py` | 图像范围校验、滑窗提取，训练和推理共用 |
 | `encoding.py` | 111 档码本、最近级选择、三组残差、十层掩模 |
 | `readout.py` | 各银行正负读出、差分和电子重构 |
 | `network.py` | 无卷积偏置参考网络、编译网络 |
@@ -49,32 +50,52 @@
 | `artifacts.py` | 独立编译模型保存/读取、写入层数和示意坐标导出 |
 | `metrics.py` | 明确区分权重误差、乘加位数、分类准确率 |
 | `pipeline.py` | 完整实验、先锁定全部种子再测试、源文件哈希 |
-| `__main__.py` | 简洁 CLI 入口 |
-| `tests/` | 编码、物理重构、数据、序列化和训练集成测试 |
+| `resources.py` | 安装包中的固定划分和示例模型，不依赖工作目录 |
+| `cli.py` / `__main__.py` | 参数解析、命令分发和模块入口 |
+| `tests/unit/` | 配置、编码和数学约束单元测试 |
+| `tests/integration/` | 读出、数据、序列化、训练与 CLI 集成测试 |
+
+代码位于 `src/residual_material_cnn/`，采用 `pyproject.toml` 统一管理安装、依赖、命令入口及质量检查。见 [架构与契约](ARCHITECTURE.md) 和 [开发规范](../../CONTRIBUTING.md)。历史论文脚本保持原路径及行为，不作为新包的隐式依赖。
 
 ## 使用
 
-在仓库根目录运行，使用 Python 3.10 或更高版本。验证环境为 PyTorch 2.7.0+cu118（实际使用 CPU）、NumPy 2.2.6；只需要 NumPy、PyTorch，测试另需 pytest，不需要 sklearn，不自动联网下载数据。
+使用 Python 3.10 或更高版本，建议新建虚拟环境。在仓库根目录先安装，再从任意目录执行。验证环境为 PyTorch 2.7.0+cu118（实际使用 CPU）、NumPy 2.2.6；新包运行只依赖 NumPy、PyTorch，不需要 sklearn，不自动联网下载数据。
 
 ```powershell
-python -m pip install -r residual_material_cnn/requirements.txt
+python -m pip install -e ".[dev]"
 python -B -m residual_material_cnn describe
-python -B -m pytest residual_material_cnn/tests -q
+python -B -m pytest tests/unit tests/integration -q
 python -B -m residual_material_cnn benchmark
 python -B -m residual_material_cnn train --output outputs/residual3_new_run --seeds 0 1 2 --epochs 20
 ```
 
-数据默认读项目根目录 `data/MNIST/raw` 的四个 gzip 文件，固定划分已独立打包在 `assets/split_indices.npz`，与历史划分逐字节一致。可通过 `--data` 和 `--split-indices` 指定本地副本；校验失败直接报错，不重新生成划分。训练始终使用 50k/10k/10k 原划分；本项目已使用过官方测试集，不是新的盲测队列。输出目录必须是新的，避免覆盖旧实验。
+`residual-material-cnn describe` 与模块入口等价。命令输出 JSON 到标准输出，进度日志到标准错误；`--log-level WARNING` 可关闭一般进度日志。成功退出码为 0，参数或输入错误为 2，运行失败为 1。
 
-三个种子的编译模型和准确率记录已包含在 `examples/`：理想三组残差测试准确率为 **94.95% ± 0.05 pp**，与各自浮点参考的测试预测一致。原始数据和训练生成的大型掩模表不随仓库发布。README 中的训练路径只是示例；目录已经存在时请改用一个新名称。
+数据默认读**当前工作目录**下 `data/MNIST/raw` 的四个 gzip 文件；在其他目录运行时请指定 `--data` 的绝对路径。固定划分已独立打包在 `assets/split_indices.npz`，与历史划分逐字节一致。可通过 `--split-indices` 指定本地副本；校验失败直接报错，不重新生成划分。训练始终使用 50k/10k/10k 原划分；本项目已使用过官方测试集，不是新的盲测队列。输出目录必须是新的，避免覆盖旧实验。
+
+三个种子的编译模型包含在安装包 `assets/models/`，准确率记录位于仓库 `examples/residual_material_cnn/`：理想三组残差测试准确率为 **94.95% ± 0.05 pp**，与各自浮点参考的测试预测一致。原始数据和训练生成的大型掩模表不随仓库发布。README 中的训练路径只是示例；目录已经存在时请改用一个新名称。
 
 仅从已编译模型推理，不加载浮点参考：
 
 ```powershell
-python -B -m residual_material_cnn evaluate --model residual_material_cnn/examples/seed0_compiled.npz --split test --data data/MNIST/raw
-python -B -m residual_material_cnn export --model residual_material_cnn/examples/seed0_compiled.npz --output outputs/residual3_masks
+python -B -m residual_material_cnn evaluate --example-seed 0 --split test --data data/MNIST/raw
+python -B -m residual_material_cnn export --example-seed 0 --output outputs/residual3_masks
+python -B -m residual_material_cnn evaluate --model outputs/residual3_new_run/seed0/compiled.npz --split test --data data/MNIST/raw
 ```
 
 每个种子导出 `write_masks/write_masks.npz`，轴顺序为 `[残差组,深度层,正负支路,输出,输入]`；1 表示写入低透过率态。`column_counts.csv` 给每列写入数及示意坐标；`electronic_biases.json` 独立保存电子偏置。坐标只说明几何排布，不保证实际层选择性、光学隔离或曝光效果。
 
 准确率、预测差异、权重误差与逐层线性乘加误差写入新实验的 `summary.json`、`REPORT_CN.md`。逐层 bit 使用固定跨度 2、点积除以输入项数；不包含偏置、激活和硬件误差，不应与 ADC 位数或未经统一口径的其他论文指标直接比较。
+
+## 开发与发布检查
+
+```powershell
+python -m pip install -e ".[dev,legacy]"
+python -m ruff check .
+python -m ruff format --check .
+python -B -m pytest --cov=residual_material_cnn --cov-report=term-missing
+python -m build
+python tools/check_wheel.py dist/rewritable_volumetric_residual_cnn-0.2.0-py3-none-any.whl
+```
+
+`legacy` 仅为运行保留的历史测试提供依赖。Ruff 的范围只覆盖新包、新测试与工具，不批量重写旧论文代码。安装包检查会把 wheel 安装到临时目录，在仓库之外加载资源和模型，并复现独立乘加基准，防止“源码目录能跑，安装后不能跑”。编译 NPZ 仍使用 schema 1，旧模型不需要转换。

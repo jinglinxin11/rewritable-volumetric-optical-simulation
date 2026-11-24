@@ -1,0 +1,7 @@
+include README.md CHANGELOG.md CONTRIBUTING.md
+recursive-include docs/residual_material_cnn *.md
+recursive-include examples/residual_material_cnn *.md *.json
+recursive-include tests/unit *.py
+recursive-include tests/integration *.py
+recursive-include tools *.py
+exclude tests/test_*.py

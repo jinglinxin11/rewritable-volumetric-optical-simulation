@@ -16,6 +16,15 @@ Training: 20 epochs, Adam, learning rate 0.005, batch size 512, original fixed
 offline bounded-float training followed by residual encoding, not binary-site
 training or hardware verification. MNIST test data have been reused in this project.
 
+The NPZ files are bundled in `src/residual_material_cnn/assets/models/` and installed
+as package resources. This directory holds the unchanged recorded reports.
+After `python -m pip install -e .`, use:
+
+```bash
+python -m residual_material_cnn evaluate --example-seed 0 --data /path/to/data/MNIST/raw --split test
+python -m residual_material_cnn export --example-seed 0 --output outputs/new_masks
+```
+
 The NPZ files contain counts, residual scales, electronic biases and metadata;
 there are no original floating-point weight matrices. NumPy loads them with
 `allow_pickle=False`. See `summary.json` for coefficient and normalized clean MAC

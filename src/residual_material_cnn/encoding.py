@@ -15,7 +15,7 @@ class Codebook:
 
 
 def build_codebook(material: MaterialConfig):
-    t = material.site_transmission**np.arange(material.depth + 1)
+    t = material.site_transmission ** np.arange(material.depth + 1)
     pairs = {}
     for plus in range(len(t)):
         for minus in range(len(t)):
@@ -44,15 +44,17 @@ class EncodedMatrix:
         c = np.asarray(self.counts)
         s = np.asarray(self.scales)
         if c.ndim != 4 or c.shape[:2] != (self.material.residual_banks, 2) or min(c.shape[2:]) < 1:
-            raise ValueError('counts must have shape [3,2,output,input]')
-        if c.dtype.kind not in 'iu' or np.any(c < 0) or np.any(c > self.material.depth):
-            raise ValueError('Written layer counts must be integers from zero to ten')
+            raise ValueError("counts must have shape [3,2,output,input]")
+        if c.dtype.kind not in "iu" or np.any(c < 0) or np.any(c > self.material.depth):
+            raise ValueError("Written layer counts must be integers from zero to ten")
         if s.shape != (self.material.residual_banks,) or not np.isfinite(s).all() or np.any(s <= 0):
-            raise ValueError('Each residual bank requires a finite positive reconstruction scale')
+            raise ValueError("Each residual bank requires a finite positive reconstruction scale")
 
     def effective_weights(self):
-        t = self.material.site_transmission**self.counts.astype(np.float64)
-        return np.sum(self.scales[:, None, None] * (t[:, 0] - t[:, 1]) / self.material.contrast, axis=0)
+        t = self.material.site_transmission ** self.counts.astype(np.float64)
+        return np.sum(
+            self.scales[:, None, None] * (t[:, 0] - t[:, 1]) / self.material.contrast, axis=0
+        )
 
     def write_masks(self):
         rank = np.empty(self.material.depth, dtype=int)
@@ -60,15 +62,16 @@ class EncodedMatrix:
         return rank[None, :, None, None, None] < self.counts[:, None]
 
 
-def encode_matrix(weight, material=MaterialConfig()):
+def encode_matrix(weight, material=None):
+    material = MaterialConfig() if material is None else material
     weight = np.asarray(weight, dtype=np.float64)
     if weight.ndim != 2 or min(weight.shape) < 1 or not np.isfinite(weight).all():
-        raise ValueError('A nonempty finite [output,input] weight matrix is required')
+        raise ValueError("A nonempty finite [output,input] weight matrix is required")
     if np.any(np.abs(weight) > 1 + 1e-12):
-        raise ValueError('Weights must be within [-1,1]; do not silently clip during compilation')
+        raise ValueError("Weights must be within [-1,1]; do not silently clip during compilation")
     book = build_codebook(material)
     residual = weight.copy()
-    scales = book.alpha**np.arange(material.residual_banks, dtype=np.float64)
+    scales = book.alpha ** np.arange(material.residual_banks, dtype=np.float64)
     encoded = []
     for scale in scales:
         indices = nearest_indices(residual / scale, book.values)

@@ -16,7 +16,7 @@ the [MIT licence](LICENSE).
 
 ## Latest Modular Experiment (2026-11-24)
 
-The new [`residual_material_cnn`](residual_material_cnn/README_CN.md) package is an
+The new [`residual_material_cnn`](docs/residual_material_cnn/README_CN.md) package is an
 independent, modular implementation of **three 5 x 5 convolution kernels with no
 convolution bias**, 3 x 3 adaptive average pooling, and **27 -> 32 -> 16 -> 10**
 dense layers retaining electronic biases. Each weight uses three residual
@@ -39,16 +39,24 @@ results and version tags are retained unchanged below; this module is not a
 reproduction of their training protocol or their 97.84% result.
 
 ```bash
-python -m pip install -r residual_material_cnn/requirements.txt
+python -m pip install -e ".[dev]"
 python -B -m residual_material_cnn describe
-python -B -m pytest residual_material_cnn/tests -q
+python -B -m pytest tests/unit tests/integration -q
 python -B -m residual_material_cnn benchmark
 ```
 
 The package includes the fixed split and three small compiled examples, but no
-raw MNIST images. See the [Chinese module guide](residual_material_cnn/README_CN.md)
-and [recorded results](residual_material_cnn/examples/README.md) for training,
+raw MNIST images. See the [Chinese module guide](docs/residual_material_cnn/README_CN.md)
+and [recorded results](examples/residual_material_cnn/README.md) for training,
 standalone inference and write-mask export commands.
+
+The installable package uses `src/residual_material_cnn/`; CLI orchestration,
+configuration, encoding, readout, training and artifact I/O have separate
+boundaries. The `residual-material-cnn` console command is equivalent to
+`python -m residual_material_cnn`. See [architecture](docs/residual_material_cnn/ARCHITECTURE.md),
+[contribution checks](CONTRIBUTING.md) and [migration notes](CHANGELOG.md).
+CI checks Linux/Windows, lint, tests with an 85% package coverage floor, and an
+installed-wheel smoke test. Historical manuscript scripts below remain source-only.
 
 ## Contents
 
