@@ -1,0 +1,213 @@
+{
+  "reference_test_mean_pct": 94.94666666666666,
+  "reference_population_sd_pp": 0.04988876515698735,
+  "compiled_test_mean_pct": 94.94666666666666,
+  "compiled_population_sd_pp": 0.04988876515698735,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "records": [
+    {
+      "seed": 0,
+      "selected_epoch": 20,
+      "validation_accuracy_pct": 94.28,
+      "elapsed_seconds": 6.0979533195495605,
+      "reference_test_accuracy_pct": 95.0,
+      "compiled_test_accuracy_pct": 95.0,
+      "differing_test_predictions": 0,
+      "coefficient_error": {
+        "rmse": 1.1408551972439948e-05,
+        "max_abs_error": 3.546336845326747e-05,
+        "fixed_span": 2.0,
+        "equivalent_bits": 15.627043534531252,
+        "exact": false
+      },
+      "clean_layer_mac_errors": {
+        "conv": {
+          "input_terms": 25,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 25600,
+          "rmse": 1.074603729261858e-06,
+          "max_abs_error": 5.71718473465696e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.035282569125997,
+          "exact": false
+        },
+        "fc1": {
+          "input_terms": 27,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.0258964798225239e-06,
+          "max_abs_error": 3.5383375068184786e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.10220215876089,
+          "exact": false
+        },
+        "fc2": {
+          "input_terms": 32,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 6.949319293502525e-07,
+          "max_abs_error": 2.2352164648978268e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.664143745365042,
+          "exact": false
+        },
+        "fc3": {
+          "input_terms": 16,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.0871291124352924e-06,
+          "max_abs_error": 3.524687209585653e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.018564027348564,
+          "exact": false
+        }
+      }
+    },
+    {
+      "seed": 1,
+      "selected_epoch": 18,
+      "validation_accuracy_pct": 94.69999999999999,
+      "elapsed_seconds": 8.216752290725708,
+      "reference_test_accuracy_pct": 94.96,
+      "compiled_test_accuracy_pct": 94.96,
+      "differing_test_predictions": 0,
+      "coefficient_error": {
+        "rmse": 1.1357213736031264e-05,
+        "max_abs_error": 3.475869229413453e-05,
+        "fixed_span": 2.0,
+        "equivalent_bits": 15.633550282037323,
+        "exact": false
+      },
+      "clean_layer_mac_errors": {
+        "conv": {
+          "input_terms": 25,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 25600,
+          "rmse": 6.989266273214342e-07,
+          "max_abs_error": 2.786566464078183e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.655874403107983,
+          "exact": false
+        },
+        "fc1": {
+          "input_terms": 27,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.1656709159104443e-06,
+          "max_abs_error": 4.120014710864289e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 18.91792676455411,
+          "exact": false
+        },
+        "fc2": {
+          "input_terms": 32,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 7.322005493286037e-07,
+          "max_abs_error": 2.4376849510933385e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.58877655783571,
+          "exact": false
+        },
+        "fc3": {
+          "input_terms": 16,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.1277953409846881e-06,
+          "max_abs_error": 3.5615415174168608e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 18.965582030779235,
+          "exact": false
+        }
+      }
+    },
+    {
+      "seed": 2,
+      "selected_epoch": 20,
+      "validation_accuracy_pct": 94.76,
+      "elapsed_seconds": 7.023037672042847,
+      "reference_test_accuracy_pct": 94.88,
+      "compiled_test_accuracy_pct": 94.88,
+      "differing_test_predictions": 0,
+      "coefficient_error": {
+        "rmse": 1.1360541566585859e-05,
+        "max_abs_error": 3.361739738443059e-05,
+        "fixed_span": 2.0,
+        "equivalent_bits": 15.633127613106486,
+        "exact": false
+      },
+      "clean_layer_mac_errors": {
+        "conv": {
+          "input_terms": 25,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 25600,
+          "rmse": 9.498222089121206e-07,
+          "max_abs_error": 3.909803179547033e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.21335792390783,
+          "exact": false
+        },
+        "fc1": {
+          "input_terms": 27,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.0207165683202248e-06,
+          "max_abs_error": 3.3683698397804496e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 19.109505003429415,
+          "exact": false
+        },
+        "fc2": {
+          "input_terms": 32,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.114781228628611e-06,
+          "max_abs_error": 3.9494921850735665e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 18.98232670419038,
+          "exact": false
+        },
+        "fc3": {
+          "input_terms": 16,
+          "normalization": "linear dot product / fan_in",
+          "bias_included": false,
+          "sample_vectors": 256,
+          "rmse": 1.3353692227890992e-06,
+          "max_abs_error": 3.627624895918835e-06,
+          "fixed_span": 2.0,
+          "equivalent_bits": 18.721848624062794,
+          "exact": false
+        }
+      }
+    }
+  ],
+  "resources": {
+    "signed_weights": 1611,
+    "electronic_biases": 58,
+    "convolution_biases": 0,
+    "branch_columns": 9666,
+    "binary_sites": 96660,
+    "neural_weight_layers": 4,
+    "residual_matrix_banks": 12
+  },
+  "limitations": [
+    "ideal simulation, not hardware",
+    "reused MNIST test cohort",
+    "new no-convolution-bias residual3 model; historical accuracies do not transfer"
+  ]
+}

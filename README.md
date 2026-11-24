@@ -14,8 +14,45 @@ the [MIT licence](LICENSE).
 > does not model wave-optical propagation, thermal behaviour, noise or crosstalk,
 > and it is not a hardware demonstration.
 
+## Latest Modular Experiment (2026-11-24)
+
+The new [`residual_material_cnn`](residual_material_cnn/README_CN.md) package is an
+independent, modular implementation of **three 5 x 5 convolution kernels with no
+convolution bias**, 3 x 3 adaptive average pooling, and **27 -> 32 -> 16 -> 10**
+dense layers retaining electronic biases. Each weight uses three residual
+differential banks of ten binary depth sites. Offline bounded-float training is
+followed by material compilation; the compiled model does not store the original
+floating-point weight matrices.
+
+| Item | Recorded value |
+| --- | --- |
+| Ideal compiled MNIST test accuracy | **94.95% +/- 0.05 percentage points** (seeds 0, 1, 2) |
+| Individual test accuracies | 95.00%, 94.96%, 94.88% |
+| Difference from the corresponding float reference predictions | 0 / 10,000 per seed |
+| Material resources | 1,611 signed weights; 9,666 branch columns; **96,660 binary sites** |
+| Bias | No convolution bias; 58 electronic dense biases |
+
+These are ideal, noise-free simulation results on the previously used MNIST test
+cohort. The separate 18.55-bit random-MAC benchmark is not a hardware ENOB or a
+claim about this network's precision. The historical 12-kernel manuscript code,
+results and version tags are retained unchanged below; this module is not a
+reproduction of their training protocol or their 97.84% result.
+
+```bash
+python -m pip install -r residual_material_cnn/requirements.txt
+python -B -m residual_material_cnn describe
+python -B -m pytest residual_material_cnn/tests -q
+python -B -m residual_material_cnn benchmark
+```
+
+The package includes the fixed split and three small compiled examples, but no
+raw MNIST images. See the [Chinese module guide](residual_material_cnn/README_CN.md)
+and [recorded results](residual_material_cnn/examples/README.md) for training,
+standalone inference and write-mask export commands.
+
 ## Contents
 
+- [Latest modular experiment](#latest-modular-experiment-2026-11-24)
 - [Model overview](#model-overview)
 - [Repository layout](#repository-layout)
 - [Modules and implementation](#modules-and-implementation)

@@ -28,3 +28,9 @@ outputs/
 build/
 dist/
 *.egg-info/
+
+# Small reproducibility inputs and compiled examples for the modular residual model.
+!residual_material_cnn/assets/split_indices.npz
+!residual_material_cnn/examples/seed0_compiled.npz
+!residual_material_cnn/examples/seed1_compiled.npz
+!residual_material_cnn/examples/seed2_compiled.npz
